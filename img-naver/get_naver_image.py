@@ -24,6 +24,7 @@ class ClovaSpeechClient:
         query_string = urllib.parse.urlencode(params)
         url = "https://openapi.naver.com/v1/search/image.xml?" + query_string
         urlRequest = urllib.request.Request(url)
+        urlRequest.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
         urlRequest.add_header("X-Naver-Client-Id", self.client_id)
         urlRequest.add_header("X-Naver-Client-Secret", self.client_secret)
         
@@ -38,14 +39,14 @@ class ClovaSpeechClient:
         img_url = xmlET.fromstring(response_body).find('channel/item/link').text
 
         img_res = requests.get(img_url, stream=True)
-        img_res.raise_for_status()
+        # img_res.raise_for_status()
         with open(save_path, "wb") as file:
             for chunk in img_res.iter_content(1024):
                 file.write(chunk)
 
 
 res = ClovaSpeechClient().get_image(
-    name = "고양이", 
+    name = "성경", 
     save_path = os.path.dirname(os.path.realpath(__file__)) + "/" + "img.jpg"
 )
 print(res)
