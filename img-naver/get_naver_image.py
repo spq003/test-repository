@@ -6,8 +6,8 @@ import xml.etree.ElementTree as xmlET
 from dotenv import load_dotenv
 
 load_dotenv()
-client_id = os.environ.get("CLIENT_ID")
-client_secret = os.environ.get("CLIENT_SECRET")
+client_id = os.environ.get("X-Naver-Client-Id")
+client_secret = os.environ.get("X-Naver-Client-Secret")
 
 def get_naver_image(name, save_path):
     params = {
