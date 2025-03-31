@@ -1,5 +1,6 @@
 __pycache__/
 .vscode/
+.vs/
 x64/
 *.log
 *.tlog
