@@ -1,6 +1,7 @@
 __pycache__/
 .vscode/
 *.log
+*.tlog
 .env
 *.pyc
 *.pyo
