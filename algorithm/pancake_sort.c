@@ -1,9 +1,8 @@
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
-#define ARR_SIZE 9
+#define ARR_SIZE 10
 
 void print_arr();
 
@@ -24,16 +23,15 @@ int* flip(int* arr, int flip_index) {
     int loops = (flip_index + 1) / 2;
 
     int end = flip_index;
-    for (int i = 0; i < loops; i++) {
-        // printf("swap %d %d\n", i, end);
+    for (int i = 0; i < loops; i++)
         swap(arr, i, end--);
-    }
+    return arr;
 }
 
 int find_max_index(int* arr, int size) {
     int max_index = 0;
     for (int i = 0; i < size; i++) {
-        if (arr[i] > max_index)
+        if (arr[i] > arr[max_index])
             max_index = i;
     }
     return max_index;
@@ -44,18 +42,20 @@ int* pancake_sort(int* pancakes, int size) {
         int max_index = find_max_index(pancakes, now);
         if (max_index != 0)
             flip(pancakes, max_index);
-        flip(pancakes, now - 1);
+        flip(pancakes, now-1);
     }
 }
 
 // test case
-// 9 5 4 1 2 3 8 6 7
+// 4 5 9 1 2 3 8 6 7
 int main() {
     srand(time(NULL));
 
     int* pancakes = malloc(sizeof(int) * ARR_SIZE);
+    if (pancakes == NULL) return -1; 
     for (int i = 0; i < ARR_SIZE; i++) {
-        scanf("%d ", &pancakes[i]);
+        //scanf("%d", &pancakes[i]);
+        pancakes[i] = rand() % 99;
     }
 
     print_arr(pancakes);
