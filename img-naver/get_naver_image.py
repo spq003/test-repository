@@ -6,48 +6,53 @@ import xml.etree.ElementTree as xmlET
 from dotenv import load_dotenv
 
 load_dotenv()
+client_id = os.environ.get("CLIENT_ID")
+client_secret = os.environ.get("CLIENT_SECRET")
 
-# 네이버 오픈 API
-# [GET] [JSON, XML] 네이버 검색의 이미지 검색 결과를 반환합니다.
-# https://openapi.naver.com/v1/search/image
-# https://openapi.naver.com/v1/search/image.xml
+def get_naver_image(name, save_path):
+    params = {
+        'query': name,
+        'display': "5",
+    }
+    query_string = urllib.parse.urlencode(params)
+    url = "https://openapi.naver.com/v1/search/image.xml?" + query_string
+    urlRequest = urllib.request.Request(url)
+    urlRequest.add_header("X-Naver-Client-Id", client_id)
+    urlRequest.add_header("X-Naver-Client-Secret", client_secret)
+    
+    response = urllib.request.urlopen(urlRequest)
+    res_code = response.getcode()
+    if(res_code == 200):
+        response_body = response.read().decode('UTF-8')
+    else:
+        print("Error Code: " + res_code)
+        return -1
 
-class ClovaSpeechClient:
-    client_id = os.environ.get("CLIENT_ID")
-    client_secret = os.environ.get("CLIENT_SECRET")
+    img_urls = xmlET.fromstring(response_body).findall('channel/item/link')
+    
+    for i in range(5):
+        # ext = img_urls[i].text[-3:] //확장자 관계없이 jpg로 모두 열리는 듯
+        # if(not(ext == "jpg" or ext == "png" or ext == "jpeg")):
+        #     ext = "jpg"
+        my_save_path = save_path + ".jpg"
 
-    def get_image(self, name, save_path):
-        params = {
-            'query': name,
-            'display': "1",
-        }
-        query_string = urllib.parse.urlencode(params)
-        url = "https://openapi.naver.com/v1/search/image.xml?" + query_string
-        urlRequest = urllib.request.Request(url)
-        urlRequest.add_header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36")
-        urlRequest.add_header("X-Naver-Client-Id", self.client_id)
-        urlRequest.add_header("X-Naver-Client-Secret", self.client_secret)
-        
-        response = urllib.request.urlopen(urlRequest)
-        res_code = response.getcode()
-        if(res_code == 200):
-            response_body = response.read().decode('UTF-8')
-        else:
-            print("Error Code: " + res_code)
-            return -1
-        
-        img_url = xmlET.fromstring(response_body).find('channel/item/link').text
+        img_res = requests.get(img_urls[i].text, stream=True)
 
-        img_res = requests.get(img_url, stream=True)
-        # img_res.raise_for_status()
-        with open(save_path, "wb") as file:
+        with open(my_save_path, "wb") as file:
             for chunk in img_res.iter_content(1024):
                 file.write(chunk)
+            try:
+                f = open(my_save_path, "rt")
+                c = f.readlines()
+                print(c)
+                continue
+            except:
+                f.close()
+                return img_res
 
 
-res = ClovaSpeechClient().get_image(
-    name = "성경", 
-    save_path = os.path.dirname(os.path.realpath(__file__)) + "/" + "img.jpg"
+res = get_naver_image(
+    name = "식칼", 
+    save_path = os.path.dirname(os.path.realpath(__file__)) + "/" + "img"
 )
 print(res)
-    
