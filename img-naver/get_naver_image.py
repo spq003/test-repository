@@ -3,6 +3,7 @@ import urllib.parse
 import urllib.request
 import requests
 import xml.etree.ElementTree as xmlET
+from PIL import Image
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -31,7 +32,7 @@ def get_naver_image(name, save_path):
     img_urls = xmlET.fromstring(response_body).findall('channel/item/link')
     
     for i in range(5):
-        # ext = img_urls[i].text[-3:] //확장자 관계없이 jpg로 모두 열리는 듯
+        # ext = img_urls[i].text[-3:] #확장자 관계없이 jpg로 모두 열리는 듯
         # if(not(ext == "jpg" or ext == "png" or ext == "jpeg")):
         #     ext = "jpg"
         my_save_path = save_path + ".jpg"
@@ -44,15 +45,26 @@ def get_naver_image(name, save_path):
             try:
                 f = open(my_save_path, "rt")
                 c = f.readlines()
-                print(c)
                 continue
             except:
                 f.close()
                 return img_res
+    return img_res
+
+# target_size의 square로 이미지 리사이징
+def resize_img(input_path, output_path, target_size):
+    try:
+        with Image.open(input_path) as img:
+            img = img.resize((target_size, target_size))
+            img.save(output_path)
+    except:
+        return -1
+    return 0
 
 
 res = get_naver_image(
-    name = "식칼", 
+    name = "성경", 
     save_path = os.path.dirname(os.path.realpath(__file__)) + "/" + "img"
 )
 print(res)
+resize_img("img.jpg", "img_resize.jpg", 200)

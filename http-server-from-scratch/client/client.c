@@ -36,7 +36,7 @@ int main() {
 	server_address.sin_family = AF_INET;
 	server_address.sin_port = htons(PORT);
 	//server_address.sin_addr.s_addr = inet_addr(IP); //inet_addr(ip)비권장
-	err_handle = inet_pton(AF_INET, IP, &(server_address.sin_addr));
+	err_handle = inet_pton(AF_INET, IP, &(server_address.sin_addr)); //inet_pton 사용
 	if (err_handle != 1) {
 		perror("in inet addr");
 		clear(server_socket);
