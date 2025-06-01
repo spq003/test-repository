@@ -5,7 +5,6 @@ import os
 import json
 import requests
 import urllib
-from pydub import AudioSegment
 
 
 def record_audio(file_path):
@@ -27,13 +26,11 @@ def record_audio(file_path):
         frames.append(data)
         if keyboard.is_pressed('enter'):
             break
-
     print("Recording finished.")
-    
     stream.stop_stream()
     stream.close()
     audio.terminate()
-
+    
     with wave.open(file_path, 'wb') as wf:
         wf.setnchannels(CHANNELS)
         wf.setsampwidth(audio.get_sample_size(FORMAT))
@@ -89,7 +86,7 @@ def clova_STT(file_path):
     return response.json().get("text")
 
 
-# AI·NAVER API의 Clova Voice 서비스 가입 필요. 월 90,000원.
+# AI·NAVER API의 Clova Voice 서비스 가입 필요.
 def clova_TTS(tts_str, speaker, save_path):
     CLOVA_VOICE_API_KEY_ID = os.environ.get("CLOVA_VOICE_API_KEY_ID")
     CLOVA_VOICE_API_KEY = os.environ.get("CLOVA_VOICE_API_KEY")
@@ -103,23 +100,23 @@ def clova_TTS(tts_str, speaker, save_path):
     request_body = {
         "speaker": speaker,
         "volume": "0",
-        "speed": "-2",
+        "speed": "-1",
         "pitch": "0",
         "text": tts_str,
         "format": "mp3"
     }
-
-    response = requests.post(url=URL, headers=request_header, json=request_body)
+    response = requests.post(url=URL, headers=request_header, data=request_body)
 
     path = save_path + ".mp3"
     if(response.status_code == 200):
         with open(path, "wb") as f:
             f.write(response.content)
     else:
+        print(f"실패: {response.text}")
         return -1
-    return
+    print(f"TTS 생성: {path}")
+    return path
 
 if __name__ == '__main__':
-    # record_audio("recoding.wav") #
-    stt_text = clova_STT("recoding.wav")
-    print(stt_text)
+    text = "test"
+    clova_TTS(text, "nkyuwon", text)
